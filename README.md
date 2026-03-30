@@ -14,7 +14,7 @@ Add dependency:
 
 ```yaml
 dependencies:
-  bloopz_sdk: ^0.0.1
+  bloopz_sdk: ^0.3.0
 ```
 
 ## Usage
