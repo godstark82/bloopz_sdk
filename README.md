@@ -6,7 +6,7 @@ Capture the **Google Play Install Referrer** parameters from a Bloopz creator li
 
 - **Install Referrer listener (Android)**: stream + one-shot getter.
 - **UTM parsing utilities**: `utm_source`, `utm_medium`, and a convenience `isBloopz` check.
-- **Postback helper**: build/send `GET https://www.bloopz.com/api/postback/cpi?...`.
+- **Postback helper**: send `POST https://www.bloopz.com/api/postback/cpi` with JSON body.
 
 ## Getting started
 
@@ -25,14 +25,17 @@ Listen for referrer params at startup:
 import 'package:bloopz_sdk/bloopz_sdk.dart';
 
 void main() {
+  // Don’t hardcode secrets in source. Prefer doing this on your server.
+  // If you must call from client, provide the key at runtime (e.g. --dart-define)
+  // and keep it out of git.
+  const yourSecretKey = String.fromEnvironment('BLOOPZ_KEY');
+
   BloopzReferrer.referrals().listen((ref) async {
     if (!ref.isBloopz) return;
 
     final utmMedium = ref.utmMedium!;
 
-    // Prefer doing this on YOUR server so params aren’t exposed to clients.
-    // This client helper is provided for convenience.
-    await BloopzPostback.sendCpi(utmMedium: utmMedium);
+    await BloopzPostback.sendCpi(utmMedium: utmMedium, key: yourSecretKey);
   });
 }
 ```
@@ -42,7 +45,7 @@ Or fetch once (Android only):
 ```dart
 final ref = await BloopzReferrer.getInstallReferrer();
 if (ref?.isBloopz ?? false) {
-  await BloopzPostback.sendCpi(utmMedium: ref!.utmMedium!);
+  await BloopzPostback.sendCpi(utmMedium: ref!.utmMedium!, key: yourSecretKey);
 }
 ```
 
@@ -50,16 +53,25 @@ if (ref?.isBloopz ?? false) {
 
 Endpoint:
 
-- `GET https://www.bloopz.com/api/postback/cpi`
+- `POST https://www.bloopz.com/api/postback/cpi`
 
-Query parameters:
+JSON body fields:
 
 - `utm_source` (**required**): must be `bloopz`
 - `utm_medium` (**required**): campaign application ID
+- `key` (**required**): your secret key
 
 Example:
 
-- `https://www.bloopz.com/api/postback/cpi?utm_source=bloopz&utm_medium=CAMPAIGN_APPLICATION_ID`
+```bash
+curl -X POST "https://your-domain.com/api/postback/cpi" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "utm_source": "bloopz",
+    "utm_medium": "CAMPAIGN_APPLICATION_ID",
+    "key": "YOUR_SECRET_KEY"
+  }'
+```
 
 ## Platform support
 
