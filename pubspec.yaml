@@ -1,11 +1,12 @@
 name: bloopz_sdk
 description: "Bloopz SDK: capture Play Store install referrer and send CPI postbacks."
-version: 0.3.0
+version: 0.4.0
 repository: https://github.com/godstark82/bloopz_sdk
 
 environment:
   sdk: ^3.11.0
-  flutter: ">=1.17.0"
+  # pub.dev requires Flutter >=1.20.0 for plugins without an `ios/` folder.
+  flutter: ">=1.20.0"
 
 dependencies:
   flutter:
